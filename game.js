@@ -160,16 +160,88 @@ scene.add(P);
 const NX = -5, NZ = 4, npc = P.clone();
 npc.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); const h = o.material.color.getHex(); if (h === 0xd9503f) o.material.color.setHex(0x4f8f6d); else if (h === 0x5a3a22) o.material.color.setHex(0xe3d08a); else if (h === 0x36548c) o.material.color.setHex(0x6b4a2b); } });
 npc.position.set(NX, H(NX, NZ), NZ); scene.add(npc); solids.push([NX, NZ, .7]);
+
+// ---------- Penduduk lain yang sedang beraktivitas ----------
+function villager(x, z, shirt, hat, pants, sc) {
+  const g = P.clone(), V = g.children[0], n = V.children.length;
+  g.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); const h = o.material.color.getHex(); if (h === 0xd9503f) o.material.color.setHex(shirt); else if (h === 0x5a3a22) o.material.color.setHex(hat); else if (h === 0x36548c) o.material.color.setHex(pants); } });
+  g.position.set(x, H(x, z), z); g.scale.setScalar(sc || 1); scene.add(g);
+  return { g, V, aL: V.children[n - 4], aR: V.children[n - 3], lL: V.children[n - 2], lR: V.children[n - 1] };
+}
+// Pak Heru memancing di tepi kolam
+const fish = villager(2, -25.9, 0x3d6fa8, 0xd8c27a, 0x5a4a38), fd = new THREE.Vector3(-2, 0, -8.1).normalize();
+fish.g.rotation.y = Math.atan2(fd.x, fd.z); solids.push([2, -25.9, .7]);
+const rod = mesh(new THREE.CylinderGeometry(.03, .05, 3, 5), wood, .35, 2.2, 1.86); rod.rotation.x = 1; fish.g.add(rod);
+const bob = mesh(new THREE.SphereGeometry(.12, 6, 5), M(0xff4a3a), 0, 0, 5.8), bobY = water.position.y - fish.g.position.y + .08; fish.g.add(bob);
+fish.g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(.35, 3, 3.1), new THREE.Vector3(0, bobY, 5.8)]), new THREE.LineBasicMaterial({ color: 0xffffff })));
+fish.aL.rotation.x = -1.2;
+// Pak Tani mencangkul petak tanah
+const farm = villager(0, -4.3, 0xc9a23c, 0xe3d08a, 0x4a4a52); farm.g.rotation.y = Math.PI; solids.push([0, -4.3, .7]);
+farm.aR.add(mesh(new THREE.CylinderGeometry(.04, .04, 1.2, 5), wood, 0, -1.4, 0)); farm.aR.add(mesh(new THREE.BoxGeometry(.5, .08, .26), M(0x8f8f95), 0, -2, .1));
+scene.add(mesh(new THREE.BoxGeometry(3.6, .12, 2), M(0x5b3d24), 0, H(0, -6.3) + .06, -6.3));
+// Bu Ratmi menyapu halaman rumah
+const sry = Math.atan2(20, -12), swx = -20 + Math.sin(sry) * 6.4 + Math.cos(sry) * 2.4, swz = 12 + Math.cos(sry) * 6.4 - Math.sin(sry) * 2.4;
+const sweep = villager(swx, swz, 0xb04a7a, 0xe8c9a0, 0x4a3a5a); sweep.g.rotation.y = sry + Math.PI; solids.push([swx, swz, .7]);
+sweep.aR.add(mesh(new THREE.CylinderGeometry(.04, .04, 1.6, 5), wood, 0, -1.5, 0));
+const brush = mesh(new THREE.ConeGeometry(.28, .45, 6), M(0xc9a85a), 0, -2.45, 0); brush.rotation.x = Math.PI; sweep.aR.add(brush);
+// Si Kecil bolak-balik di jalan setapak
+const kid = villager(3, 2.7, 0x3aa6b9, 0xf2c14e, 0x7a3b3b, .72), KA = [3, 2.7], KB = [13, 12.5]; let kt = 0, kdir = 1;
+// Domba di kandang
+const sheep = [];
+for (let i = 0; i < 4; i++) {
+  const g = new THREE.Group(), wl = M(0xf4f1e8), dk = M(0x3a3330), b = mesh(new THREE.IcosahedronGeometry(.75, 1), wl, 0, .85, 0); b.scale.set(1.1, .85, .8); g.add(b);
+  g.add(mesh(new THREE.SphereGeometry(.28, 6, 5), dk, .82, 1, 0));
+  [[.4, .3], [.4, -.3], [-.4, .3], [-.4, -.3]].forEach(l => g.add(mesh(new THREE.CylinderGeometry(.07, .07, .5, 5), dk, l[0], .25, l[1])));
+  const x = rr(-4, 4), z = rr(24, 30); g.position.set(x, H(x, z), z); scene.add(g); sheep.push({ g, tx: x, tz: z, wait: rr(0, 3) });
+}
+function crew(dt) {
+  const t = time, s = Math.sin(t * 3);
+  bob.position.y = bobY + Math.sin(t * 3) * .04; fish.aR.rotation.x = -1.2 - .3 * Math.pow(Math.max(0, Math.sin(t * .6)), 6); fish.V.rotation.x = Math.sin(t * .8) * .03;
+  farm.aL.rotation.x = farm.aR.rotation.x = -1 - .9 * s; farm.V.rotation.x = .25 + .12 * s;
+  sweep.aR.rotation.x = -.5 + Math.sin(t * 4) * .4; sweep.aL.rotation.x = -.3 - Math.sin(t * 4) * .2; sweep.V.rotation.x = .15;
+  const L = Math.hypot(KB[0] - KA[0], KB[1] - KA[1]); kt += kdir * dt * 1.7 / L; if (kt > 1) { kt = 1; kdir = -1; } if (kt < 0) { kt = 0; kdir = 1; }
+  const kx = KA[0] + (KB[0] - KA[0]) * kt, kz = KA[1] + (KB[1] - KA[1]) * kt, w = Math.sin(t * 9) * .8;
+  kid.g.position.set(kx, H(kx, kz) + Math.abs(Math.sin(t * 9)) * .06, kz); kid.g.rotation.y = Math.atan2((KB[0] - KA[0]) * kdir, (KB[1] - KA[1]) * kdir);
+  kid.aL.rotation.x = w; kid.aR.rotation.x = -w; kid.lL.rotation.x = -w; kid.lR.rotation.x = w;
+  sheep.forEach((o, i) => {
+    const p = o.g.position;
+    if (o.wait > 0) { o.wait -= dt; return; }
+    const dx = o.tx - p.x, dz = o.tz - p.z, d = Math.hypot(dx, dz);
+    if (d < .2) { o.tx = rr(-4.5, 4.5); o.tz = rr(24, 30.5); o.wait = rr(1, 4); return; }
+    p.x += dx / d * .9 * dt; p.z += dz / d * .9 * dt; p.y = H(p.x, p.z) + Math.abs(Math.sin(t * 8 + i)) * .05;
+    o.g.rotation.y = Math.atan2(-dz, dx);
+  });
+}
 let t0 = 0, lastTxt = '', skyT = 0, ac;
 const fmt = s => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 const beep = (f, d, t, v) => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = t || 'sine'; o.frequency.value = f; g.gain.setValueAtTime(v || .12, ac.currentTime); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + d); o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d); } catch (e) {} };
 const DIRS = ['depan', 'depan kanan', 'kanan', 'belakang kanan', 'belakang', 'belakang kiri', 'kiri', 'depan kiri'], wpos = pond.attributes.position;
+// ---------- Siklus waktu: siang, sore, malam, pagi (1 putaran = 200 detik) ----------
+const K = [
+  { s: ['#3d7fd1', '#79b4ec', '#cfe6f5', '#cfe6f5'], l: 0xfff1d0, si: 1.35, hi: .95, ex: 1.05, st: 0, w: .2, e: 60, d: 0xfff4d0, c: 0xffffff, f: .1 },
+  { s: ['#4a5fa8', '#d98fa0', '#f0b68a', '#f0b68a'], l: 0xffb878, si: 1.25, hi: .75, ex: 1.1, st: 0, w: .9, e: 14, d: 0xffd090, c: 0xffd6c4, f: .5 },
+  { s: ['#01030a', '#050918', '#0a1029', '#0a1029'], l: 0x6f84e0, si: .1, hi: .1, ex: .85, st: 1, w: 3, e: 48, d: 0xdfe6ff, c: 0x3a4468, f: 1 },
+  { s: ['#5a6fa8', '#e8a99a', '#f4cfa0', '#f4cfa0'], l: 0xffc890, si: .9, hi: .55, ex: 1, st: .2, w: 1, e: 10, d: 0xffd9a0, c: 0xffe0d0, f: .4 }
+];
+K.splice(3, 0, Object.assign({}, K[2])); // malam dibuat lebih lama
+const lamp = new THREE.PointLight(0xffc880, 0, 22); lamp.position.set(0, 2.4, .5); P.add(lamp);
+K.forEach(k => { k.s = k.s.map(c => new THREE.Color(c)); ['l', 'd', 'c'].forEach(q => k[q] = new THREE.Color(k[q])); });
+const cur = { s: [0, 1, 2, 3].map(() => new THREE.Color()), l: new THREE.Color(), d: new THREE.Color(), c: new THREE.Color() }, PH = ['Siang', 'Sore', 'Malam', 'Malam', 'Pagi'], AZ = Math.atan2(28, 55);
+let ph = 0;
+function cycle() {
+  ph = (time / 200) % 1; const N = K.length, i = Math.floor(ph * N), f = ph * N - i, u = f * f * (3 - 2 * f), a = K[i], b = K[(i + 1) % N], m = (x, y) => x + (y - x) * u;
+  ['l', 'd', 'c'].forEach(q => cur[q].copy(a[q]).lerp(b[q], u)); cur.s.forEach((c, j) => c.copy(a.s[j]).lerp(b.s[j], u));
+  const night = m(a.st, b.st), e = m(a.e, b.e) * Math.PI / 180;
+  SUNDIR.set(Math.cos(AZ) * Math.cos(e), Math.sin(e), Math.sin(AZ) * Math.cos(e)).multiplyScalar(66);
+  sun.color.copy(cur.l); sun.intensity = m(a.si, b.si); hemi.intensity = m(a.hi, b.hi); renderer.toneMappingExposure = m(a.ex, b.ex);
+  disc.material.color.copy(cur.d); stars.material.opacity = night; lamp.intensity = 2.4 * night; stars.position.copy(cam.position);
+  cloudM.color.copy(cur.c); cloudM.emissive.copy(cur.c); flies.material.opacity = .2 + .8 * m(a.f, b.f);
+  wins.forEach(w => w.emissiveIntensity = m(a.w, b.w));
+  if (time - skyT > .3) { skyT = time; const g = sx.createLinearGradient(0, 0, 0, 256); [0, .5, .8, 1].forEach((p, j) => g.addColorStop(p, '#' + cur.s[j].getHexString())); sx.fillStyle = g; sx.fillRect(0, 0, 2, 256); scene.background.needsUpdate = true; scene.fog.color.copy(cur.s[2]); }
+}
 function extras(dt) {
-  const n = (Math.sin(time * .025 - 1.2) + 1) / 2;
-  if (time - skyT > .4) { skyT = time; paintSky(n); }
-  sun.intensity = 1.25 - .95 * n; hemi.intensity = .75 - .45 * n; sun.color.setHex(0xffb878).lerp(tc.setHex(0x8fa0ff), n);
-  renderer.toneMappingExposure = 1.1 - .2 * n; stars.material.opacity = Math.max(0, (n - .35) * 1.5); stars.position.copy(cam.position);
-  wins.forEach(m => m.emissiveIntensity = .7 + 1.8 * n);
+  crew(dt);
+  cycle();
   for (let i = 0; i < wpos.count; i++) wpos.setY(i, .07 * Math.sin(time * 2 + wpos.getX(i) * 1.3 + wpos.getZ(i) * 1.1)); wpos.needsUpdate = true;
   blades.rotation.z += dt * .8;
   puffs.forEach(p => { const t = (time * .3 + p.userData.k * .25) % 1, c = p.userData.c; p.position.set(c[0] + t * 1.5, c[1] + t * 4, c[2]); p.scale.setScalar(.5 + t * 1.8); p.material.opacity = .55 * (1 - t); });
@@ -184,7 +256,7 @@ function extras(dt) {
     }
   }
   $('npc').style.display = txt ? 'block' : 'none'; if (txt && txt !== lastTxt) { $('nt').textContent = txt; lastTxt = txt; }
-  if (running) $('tm').textContent = fmt(time - t0);
+  if (running) $('tm').textContent = fmt(time - t0) + ' · ' + PH[Math.round(ph * K.length) % K.length];
 }
 
 // ---------- Koin & Kristal ----------
