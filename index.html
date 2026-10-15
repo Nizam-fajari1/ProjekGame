@@ -22,7 +22,14 @@
 <div id="start" class="overlay">
   <h2>Desa<br>Misteri</h2>
   <p>Senja turun di desa kecil ini, dan koin-koin tua mulai menyala di antara pepohonan. Kumpulkan semuanya, jawab teka-teki penjaganya, lalu sentuh kristal di tengah desa.</p>
-  <button id="go" class="plank">Masuk desa</button>
+  <button id="go" class="plank">Main sendiri</button>
+  <div class="lobby">
+    <input id="nm" maxlength="12" placeholder="Namamu" autocomplete="off">
+    <button id="mk" class="plank">Buat room</button>
+    <input id="cd" maxlength="4" placeholder="Kode" autocomplete="off">
+    <button id="jn" class="plank">Masuk room</button>
+  </div>
+  <p id="lob"></p>
 </div>
 
 <div id="end" class="overlay hidden">
@@ -44,6 +51,7 @@
 
 <script>addEventListener('error',function(e){var p=document.querySelector('#start p');if(p)p.textContent='Gagal memuat game: '+e.message+(e.lineno?' (baris '+e.lineno+')':'')+'. Pastikan internet aktif lalu muat ulang halaman.'});</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

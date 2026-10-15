@@ -1,372 +1,60 @@
-:root {
-  --kayu: #3b2514;
-  --papan: #7b5230;
-  --kapur: #eef2e6;
-  --tulis: #1d3a30;
-  --font: "Bungee", "Impact", "Arial Black", sans-serif;
-  --body: "Trebuchet MS", "Segoe UI", sans-serif;
+:root{--kayu:#3b2514;--papan:#7b5230;--kapur:#eef2e6;--tulis:#1d3a30;--font:'Bungee','Impact','Arial Black',sans-serif;--body:'Trebuchet MS','Segoe UI',sans-serif}
+*{margin:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#141a33;color:#f6ead2;font-family:var(--body)}
+#game{display:block;width:100%;height:100%;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+#game:active{cursor:grabbing}
+.hud{position:fixed;pointer-events:none}
+.plank{background:repeating-linear-gradient(90deg,#0000 0 46px,#0003 46px 48px),linear-gradient(#8a5c35,#68431f);border:3px solid var(--kayu);border-radius:5px;box-shadow:0 4px 0 #24150a,0 10px 20px #0007;color:#f6ead2}
+#title{top:14px;left:20px}
+#title h1{font:400 28px/1 var(--font);color:#f6ead2;text-shadow:3px 3px 0 var(--kayu),-1px -1px 0 var(--kayu)}
+#score{top:14px;right:20px;padding:8px 16px 8px 12px;display:flex;align-items:center;gap:6px;font:400 20px var(--font)}
+#score b{font-weight:400}
+#score span{margin-left:12px;font:400 14px var(--body);opacity:.8;font-variant-numeric:tabular-nums}
+.coin{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe27a,#d99a00);border:2px solid #7a4a00}
+#map{top:78px;right:20px;width:170px;height:170px;border-radius:50%;border:6px solid #5a3a22;background:#1d3a30c8;box-shadow:0 0 0 2px #24150a,0 10px 20px #0007}
+#mission{bottom:22px;left:50%;transform:translateX(-50%);padding:10px 22px;max-width:min(560px,92vw);text-align:center;line-height:1.4;font-size:15px}
+#mission b{font:400 14px var(--font);margin-right:10px;color:#ffd24a}
+#npc{bottom:96px;left:50%;transform:translateX(-50%);display:none;background:var(--kapur);color:#2a190c;padding:8px 16px 10px;border-radius:12px 12px 12px 2px;border:3px solid var(--kayu);max-width:min(420px,90vw);line-height:1.4;font-size:15px}
+#npc em{display:block;font:400 12px var(--font);color:#7b5230;margin-bottom:2px;font-style:normal}
+#keys{bottom:22px;left:20px;font-size:12px;max-width:190px;line-height:1.7;opacity:.85;text-shadow:0 1px 4px #000}
+#toast{top:92px;left:50%;transform:translateX(-50%);background:#0009;padding:9px 18px;border-radius:8px;opacity:0;transition:opacity .4s;text-align:center;max-width:min(380px,60vw);font-size:14px}
+.overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:#0b1020d9}
+.overlay.hidden{display:none}
+#start{align-items:flex-start;justify-content:flex-end;text-align:left;padding:6vh 7vw;background:linear-gradient(0deg,#0b1020ee 10%,#0b102033 65%)}
+.overlay h2{font:400 clamp(40px,8vw,84px)/.95 var(--font);color:#f6ead2;text-shadow:4px 4px 0 var(--kayu)}
+.overlay p{max-width:440px;line-height:1.6;opacity:.92}
+button{cursor:pointer;font:400 17px var(--font);padding:12px 28px;color:#f6ead2}
+button:hover{filter:brightness(1.15)}
+button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.lobby{display:flex;flex-wrap:wrap;gap:10px;align-items:center;max-width:480px}
+.lobby input{font:400 15px var(--font);padding:11px 12px;width:110px;background:var(--tulis);color:var(--kapur);border:3px solid var(--kayu);border-radius:5px;text-transform:uppercase}
+.lobby input#nm{width:150px;text-transform:none}
+.lobby input::placeholder{color:#eef2e680}
+.lobby button{padding:11px 18px;font-size:14px}
+#lob{min-height:1.4em;color:#ffd24a;font-size:14px}
+#quiz{z-index:5}
+.board{background:linear-gradient(135deg,#24473b,var(--tulis));border:12px solid var(--papan);outline:3px solid var(--kayu);box-shadow:inset 0 0 40px #0006,0 14px 30px #000a;padding:24px;width:min(480px,100%);font-family:'Segoe Print','Bradley Hand','Comic Sans MS',cursive;color:var(--kapur)}
+.board p{font-size:13px;opacity:.75;margin-bottom:8px}
+.board h3{font-size:clamp(20px,5vw,25px);font-weight:400;line-height:1.35;margin-bottom:16px}
+.opts{display:flex;flex-direction:column;gap:10px;counter-reset:o}
+.opt{width:100%;text-align:left;background:none;color:var(--kapur);border:2px dashed #eef2e68c;border-radius:6px;padding:11px 14px;font:400 17px 'Segoe Print','Bradley Hand','Comic Sans MS',cursive}
+.opt::before{counter-increment:o;content:counter(o,upper-alpha) '. ';opacity:.7}
+.opt:hover{background:#eef2e61f;filter:none}
+.touch-only{display:none}
+#joy,#jump{position:fixed;bottom:26px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#joy{left:26px;width:130px;height:130px;border-radius:50%;background:#ffffff22;border:3px solid #ffffff55}
+#knob{position:absolute;left:35px;top:35px;width:60px;height:60px;border-radius:50%;background:#f6ead2aa;border:3px solid var(--kayu);pointer-events:none}
+#jump{right:26px;width:88px;height:88px;border-radius:50%;padding:0;font-size:14px}
+@media (pointer:coarse){.touch-only{display:block}#keys{display:none}}
+@media (max-width:600px){
+#title h1{font-size:20px}
+#score{top:10px;right:12px;padding:5px 10px;font-size:16px}#score span{display:none}
+#map{width:104px;height:104px;top:54px;right:12px;border-width:4px}
+#mission{top:46px;bottom:auto;left:12px;transform:none;text-align:left;font-size:12px;padding:7px 12px;max-width:calc(100vw - 140px)}
+#mission b{display:block;margin:0 0 2px}
+#npc{bottom:160px;font-size:13px}
+#toast{top:172px;font-size:13px;max-width:70vw}
+#joy{left:16px;bottom:18px}#jump{right:16px;bottom:24px}
+#start{padding:8vh 6vw}
 }
-* {
-  margin: 0;
-  box-sizing: border-box;
-}
-html,
-body {
-  height: 100%;
-  overflow: hidden;
-  background: #141a33;
-  color: #f6ead2;
-  font-family: var(--body);
-}
-#game {
-  display: block;
-  width: 100%;
-  height: 100%;
-  cursor: grab;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-#game:active {
-  cursor: grabbing;
-}
-.hud {
-  position: fixed;
-  pointer-events: none;
-}
-.plank {
-  background:
-    repeating-linear-gradient(90deg, #0000 0 46px, #0003 46px 48px),
-    linear-gradient(#8a5c35, #68431f);
-  border: 3px solid var(--kayu);
-  border-radius: 5px;
-  box-shadow:
-    0 4px 0 #24150a,
-    0 10px 20px #0007;
-  color: #f6ead2;
-}
-#title {
-  top: 14px;
-  left: 20px;
-}
-#title h1 {
-  font: 400 28px/1 var(--font);
-  color: #f6ead2;
-  text-shadow:
-    3px 3px 0 var(--kayu),
-    -1px -1px 0 var(--kayu);
-}
-#score {
-  top: 14px;
-  right: 20px;
-  padding: 8px 16px 8px 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font: 400 20px var(--font);
-}
-#score b {
-  font-weight: 400;
-}
-#score span {
-  margin-left: 12px;
-  font: 400 14px var(--body);
-  opacity: 0.8;
-  font-variant-numeric: tabular-nums;
-}
-.coin {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffe27a, #d99a00);
-  border: 2px solid #7a4a00;
-}
-#map {
-  top: 78px;
-  right: 20px;
-  width: 170px;
-  height: 170px;
-  border-radius: 50%;
-  border: 6px solid #5a3a22;
-  background: #1d3a30c8;
-  box-shadow:
-    0 0 0 2px #24150a,
-    0 10px 20px #0007;
-}
-#mission {
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 22px;
-  max-width: min(560px, 92vw);
-  text-align: center;
-  line-height: 1.4;
-  font-size: 15px;
-}
-#mission b {
-  font: 400 14px var(--font);
-  margin-right: 10px;
-  color: #ffd24a;
-}
-#npc {
-  bottom: 96px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: none;
-  background: var(--kapur);
-  color: #2a190c;
-  padding: 8px 16px 10px;
-  border-radius: 12px 12px 12px 2px;
-  border: 3px solid var(--kayu);
-  max-width: min(420px, 90vw);
-  line-height: 1.4;
-  font-size: 15px;
-}
-#npc em {
-  display: block;
-  font: 400 12px var(--font);
-  color: #7b5230;
-  margin-bottom: 2px;
-  font-style: normal;
-}
-#keys {
-  bottom: 22px;
-  left: 20px;
-  font-size: 12px;
-  max-width: 190px;
-  line-height: 1.7;
-  opacity: 0.85;
-  text-shadow: 0 1px 4px #000;
-}
-#toast {
-  top: 92px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #0009;
-  padding: 9px 18px;
-  border-radius: 8px;
-  opacity: 0;
-  transition: opacity 0.4s;
-  text-align: center;
-  max-width: min(380px, 60vw);
-  font-size: 14px;
-}
-.overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 24px;
-  text-align: center;
-  background: #0b1020d9;
-}
-.overlay.hidden {
-  display: none;
-}
-#start {
-  align-items: flex-start;
-  justify-content: flex-end;
-  text-align: left;
-  padding: 6vh 7vw;
-  background: linear-gradient(0deg, #0b1020ee 10%, #0b102033 65%);
-}
-.overlay h2 {
-  font: 400 clamp(40px, 8vw, 84px)/0.95 var(--font);
-  color: #f6ead2;
-  text-shadow: 4px 4px 0 var(--kayu);
-}
-.overlay p {
-  max-width: 440px;
-  line-height: 1.6;
-  opacity: 0.92;
-}
-button {
-  cursor: pointer;
-  font: 400 17px var(--font);
-  padding: 12px 28px;
-  color: #f6ead2;
-}
-button:hover {
-  filter: brightness(1.15);
-}
-button:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 3px;
-}
-#quiz {
-  z-index: 5;
-}
-.board {
-  background: linear-gradient(135deg, #24473b, var(--tulis));
-  border: 12px solid var(--papan);
-  outline: 3px solid var(--kayu);
-  box-shadow:
-    inset 0 0 40px #0006,
-    0 14px 30px #000a;
-  padding: 24px;
-  width: min(480px, 100%);
-  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
-  color: var(--kapur);
-}
-.board p {
-  font-size: 13px;
-  opacity: 0.75;
-  margin-bottom: 8px;
-}
-.board h3 {
-  font-size: clamp(20px, 5vw, 25px);
-  font-weight: 400;
-  line-height: 1.35;
-  margin-bottom: 16px;
-}
-.opts {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  counter-reset: o;
-}
-.opt {
-  width: 100%;
-  text-align: left;
-  background: none;
-  color: var(--kapur);
-  border: 2px dashed #eef2e68c;
-  border-radius: 6px;
-  padding: 11px 14px;
-  font:
-    400 17px "Segoe Print",
-    "Bradley Hand",
-    "Comic Sans MS",
-    cursive;
-}
-.opt::before {
-  counter-increment: o;
-  content: counter(o, upper-alpha) ". ";
-  opacity: 0.7;
-}
-.opt:hover {
-  background: #eef2e61f;
-  filter: none;
-}
-.touch-only {
-  display: none;
-}
-#joy,
-#jump {
-  position: fixed;
-  bottom: 26px;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-#joy {
-  left: 26px;
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  background: #ffffff22;
-  border: 3px solid #ffffff55;
-}
-#knob {
-  position: absolute;
-  left: 35px;
-  top: 35px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #f6ead2aa;
-  border: 3px solid var(--kayu);
-  pointer-events: none;
-}
-#jump {
-  right: 26px;
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  padding: 0;
-  font-size: 14px;
-}
-@media (pointer: coarse) {
-  .touch-only {
-    display: block;
-  }
-  #keys {
-    display: none;
-  }
-}
-@media (max-width: 600px) {
-  #title h1 {
-    font-size: 20px;
-  }
-  #score {
-    top: 10px;
-    right: 12px;
-    padding: 5px 10px;
-    font-size: 16px;
-  }
-  #score span {
-    display: none;
-  }
-  #map {
-    width: 104px;
-    height: 104px;
-    top: 54px;
-    right: 12px;
-    border-width: 4px;
-  }
-  #mission {
-    top: 46px;
-    bottom: auto;
-    left: 12px;
-    transform: none;
-    text-align: left;
-    font-size: 12px;
-    padding: 7px 12px;
-    max-width: calc(100vw - 140px);
-  }
-  #mission b {
-    display: block;
-    margin: 0 0 2px;
-  }
-  #npc {
-    bottom: 160px;
-    font-size: 13px;
-  }
-  #toast {
-    top: 172px;
-    font-size: 13px;
-    max-width: 70vw;
-  }
-  #joy {
-    left: 16px;
-    bottom: 18px;
-  }
-  #jump {
-    right: 16px;
-    bottom: 24px;
-  }
-  #start {
-    padding: 8vh 6vw;
-  }
-}
-@media (max-height: 480px) {
-  #joy {
-    width: 110px;
-    height: 110px;
-    bottom: 10px;
-  }
-  #knob {
-    left: 25px;
-    top: 25px;
-  }
-  #jump {
-    bottom: 12px;
-  }
-  #npc {
-    bottom: 70px;
-  }
-}
+@media (max-height:480px){#joy{width:110px;height:110px;bottom:10px}#knob{left:25px;top:25px}#jump{bottom:12px}#npc{bottom:70px}}

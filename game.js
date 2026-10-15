@@ -229,7 +229,7 @@ K.forEach(k => { k.s = k.s.map(c => new THREE.Color(c)); ['l', 'd', 'c'].forEach
 const cur = { s: [0, 1, 2, 3].map(() => new THREE.Color()), l: new THREE.Color(), d: new THREE.Color(), c: new THREE.Color() }, PH = ['Siang', 'Sore', 'Malam', 'Malam', 'Pagi'], AZ = Math.atan2(28, 55);
 let ph = 0;
 function cycle() {
-  ph = (time / 200) % 1; const N = K.length, i = Math.floor(ph * N), f = ph * N - i, u = f * f * (3 - 2 * f), a = K[i], b = K[(i + 1) % N], m = (x, y) => x + (y - x) * u;
+  ph = ((time + tOff) / 200) % 1; const N = K.length, i = Math.floor(ph * N), f = ph * N - i, u = f * f * (3 - 2 * f), a = K[i], b = K[(i + 1) % N], m = (x, y) => x + (y - x) * u;
   ['l', 'd', 'c'].forEach(q => cur[q].copy(a[q]).lerp(b[q], u)); cur.s.forEach((c, j) => c.copy(a.s[j]).lerp(b.s[j], u));
   const night = m(a.st, b.st), e = m(a.e, b.e) * Math.PI / 180;
   SUNDIR.set(Math.cos(AZ) * Math.cos(e), Math.sin(e), Math.sin(AZ) * Math.cos(e)).multiplyScalar(66);
@@ -240,7 +240,7 @@ function cycle() {
   if (time - skyT > .3) { skyT = time; const g = sx.createLinearGradient(0, 0, 0, 256); [0, .5, .8, 1].forEach((p, j) => g.addColorStop(p, '#' + cur.s[j].getHexString())); sx.fillStyle = g; sx.fillRect(0, 0, 2, 256); scene.background.needsUpdate = true; scene.fog.color.copy(cur.s[2]); }
 }
 function extras(dt) {
-  crew(dt);
+  crew(dt); net(dt);
   cycle();
   for (let i = 0; i < wpos.count; i++) wpos.setY(i, .07 * Math.sin(time * 2 + wpos.getX(i) * 1.3 + wpos.getZ(i) * 1.1)); wpos.needsUpdate = true;
   blades.rotation.z += dt * .8;
@@ -295,6 +295,64 @@ jb.addEventListener('pointerdown', jset(true)); jb.addEventListener('pointerup',
 
 let tt; const toast = m => { const e = $('toast'); e.textContent = m; e.style.opacity = 1; clearTimeout(tt); tt = setTimeout(() => e.style.opacity = 0, 3500); };
 
+// ---------- Mabar 2 pemain (PeerJS, tanpa server sendiri) ----------
+// Dunia dibuat dari seed yang sama, jadi posisi koin otomatis identik di kedua pemain.
+const rp = villager(0, 0, 0x2f8fd6, 0xf2e6b0, 0x2b2f45); rp.g.visible = false;
+let conn = null, peer = null, isHost = false, tOff = 0, myName = 'Pemain', rpT = { x: 0, y: 0, z: 0, f: 0, w: 0, a: 0 }, sendT = 0, rpWalk = 0;
+function nameTag(txt) {
+  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 64; const x = cv.getContext('2d');
+  x.font = '700 28px Trebuchet MS, sans-serif'; x.textAlign = 'center'; const w = x.measureText(txt).width + 26;
+  x.fillStyle = '#000a'; x.fillRect(128 - w / 2, 10, w, 44); x.fillStyle = '#fff'; x.fillText(txt, 128, 42);
+  if (rp.tag) rp.g.remove(rp.tag);
+  rp.tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthTest: false, fog: false })); rp.tag.scale.set(3, .75, 1); rp.tag.position.y = 3; rp.tag.renderOrder = 10; rp.g.add(rp.tag);
+}
+function setup(c) {
+  conn = c;
+  const hi = () => c.send({ t: 'hi', n: myName, T: time }); c.open ? hi() : c.on('open', hi);
+  c.on('data', d => {
+    if (d.t === 'hi') { nameTag(String(d.n).slice(0, 12)); rp.g.visible = true; if (!isHost) tOff = d.T - time; toast(d.n + ' bergabung!'); if (!$('start').classList.contains('hidden')) $('go').click(); }
+    else if (d.t === 's') { if (!rp.seen) { rp.seen = true; rp.g.position.set(d.x, d.y, d.z); } rpT = d; }
+    else if (d.t === 'c') { const k = coins[d.i]; if (k) { k.ok = true; k.remote = true; } }
+    else if (d.t === 'w' && stage < 2) { stage = 2; running = false; $('res').textContent = 'Temanmu menyentuh kristal. Kalian berhasil bersama!'; $('end').classList.remove('hidden'); }
+  });
+  c.on('close', () => { rp.g.visible = false; conn = null; toast('Temanmu keluar dari permainan.'); });
+}
+const ready = () => { myName = ($('nm').value || 'Pemain').trim().slice(0, 12); if (typeof Peer === 'undefined') { $('lob').textContent = 'PeerJS gagal dimuat. Cek koneksi internet.'; return false; } return true; };
+const perr = e => {
+  console.warn('PeerJS:', e);
+  if (e.type === 'unavailable-id') return 'Kode bentrok, klik Buat room sekali lagi.';
+  if (e.type === 'peer-unavailable') return 'Room tidak ditemukan. Pastikan temanmu sudah klik Buat room dan kodenya benar.';
+  if (e.type === 'webrtc') return 'Koneksi antar pemain gagal. Coba ganti jaringan salah satu pemain (misalnya Wi-Fi ke data seluler).';
+  if (['network', 'server-error', 'socket-error', 'socket-closed'].includes(e.type)) return 'Tidak bisa menghubungi server PeerJS (' + e.type + '). Cek internet, matikan VPN atau ad-blocker, atau ganti jaringan, lalu coba lagi.';
+  return 'Gagal: ' + e.type;
+};
+$('mk').onclick = () => {
+  if (!ready()) return; isHost = true; if (peer) peer.destroy();
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let id = ''; for (let i = 0; i < 4; i++) id += A[Math.floor(Math.random() * A.length)];
+  $('lob').textContent = 'Menghubungi server PeerJS...'; peer = new Peer('desa-' + id);
+  const to = setTimeout(() => { $('lob').textContent = 'Server PeerJS tidak merespons setelah 10 detik. Matikan VPN atau ad-blocker, atau ganti jaringan, lalu klik Buat room lagi.'; }, 10000);
+  peer.on('open', () => { clearTimeout(to); $('lob').textContent = 'Kode room: ' + id + '. Kirim ke temanmu, game mulai otomatis begitu dia masuk.'; });
+  peer.on('connection', setup); peer.on('disconnected', () => peer.reconnect());
+  peer.on('error', e => { clearTimeout(to); $('lob').textContent = perr(e); });
+};
+$('jn').onclick = () => {
+  if (!ready()) return; isHost = false; const id = $('cd').value.trim().toUpperCase();
+  if (id.length < 4) { $('lob').textContent = 'Isi kode 4 huruf dari temanmu.'; return; }
+  if (peer) peer.destroy(); $('lob').textContent = 'Menghubungi server PeerJS...'; peer = new Peer();
+  const to = setTimeout(() => { if (!rp.g.visible) $('lob').textContent = 'Belum tersambung setelah 12 detik. Pastikan temanmu sudah membuat room, kodenya benar, dan coba ganti jaringan kalau masih gagal.'; }, 12000);
+  peer.on('open', () => { $('lob').textContent = 'Menyambung ke room ' + id + '...'; setup(peer.connect('desa-' + id)); });
+  peer.on('error', e => { clearTimeout(to); $('lob').textContent = perr(e); });
+};
+function net(dt) {
+  if (conn && conn.open && running) { sendT -= dt; if (sendT <= 0) { sendT = .06; conn.send({ t: 's', x: px, y: py, z: pz, f: face, w: Math.hypot(vx, vz), a: py > H(px, pz) + .1 ? 1 : 0 }); } }
+  if (!rp.g.visible) return;
+  const g = rp.g, k = 1 - Math.exp(-12 * dt);
+  g.position.x += (rpT.x - g.position.x) * k; g.position.y += (rpT.y - g.position.y) * k; g.position.z += (rpT.z - g.position.z) * k;
+  let d = rpT.f - g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); g.rotation.y += d * k;
+  rpWalk += dt * rpT.w * 1.6; const sw = Math.sin(rpWalk) * Math.min(1, rpT.w / 6) * .9;
+  if (rpT.a) { rp.aL.rotation.x = rp.aR.rotation.x = -2.4; rp.lL.rotation.x = .4; rp.lR.rotation.x = -.4; } else { rp.aL.rotation.x = sw; rp.aR.rotation.x = -sw; rp.lL.rotation.x = -sw; rp.lR.rotation.x = sw; }
+}
+
 // ---------- Loop ----------
 let running = false, px = 0, pz = 9, py = H(0, 9), vx = 0, vz = 0, vy = 0, face = Math.PI, walk = 0, score = 0, stage = 0, time = 0;
 const clock = new THREE.Clock();
@@ -311,6 +369,7 @@ function drawMap() {
   c.fillStyle = '#d9c29a'; houses.forEach(o => { const [x, y] = pt(o[0], o[1]); c.fillRect(x * k - 4, y * k - 4, 8, 8); });
   const [kx, ky] = pt(0, 0); c.fillStyle = stage ? '#55f0ff' : '#8a8a99';
   c.beginPath(); c.moveTo(kx * k, ky * k - 6); c.lineTo(kx * k + 5, ky * k); c.lineTo(kx * k, ky * k + 6); c.lineTo(kx * k - 5, ky * k); c.fill();
+  if (rp.g.visible) { const [fx2, fy2] = pt(rp.g.position.x, rp.g.position.z); let X = fx2 * k, Y = fy2 * k; const dd = Math.hypot(X, Y); if (dd > h - 10) { X *= (h - 10) / dd; Y *= (h - 10) / dd; } c.fillStyle = '#4db8ff'; c.strokeStyle = '#fff'; c.lineWidth = 1.5; c.beginPath(); c.arc(X, Y, 4.5, 0, 6.283); c.fill(); c.stroke(); }
   coins.forEach(o => {
     if (!o.g.visible) return;
     let [x, y] = pt(o.g.position.x, o.g.position.z); x *= k; y *= k;
@@ -382,7 +441,7 @@ function update(dt) {
     c.g.rotation.y += dt * 2.2; c.g.position.y = c.y0 + Math.sin(time * 2 + i) * .2;
     if (!c.ok && time > (c.cd || 0) && Math.hypot(c.g.position.x - px, c.g.position.z - pz) < 1.4 && Math.abs(c.g.position.y - py - 1) < 2.5) ask(c);
     if (c.ok) {
-      c.g.visible = false; score++; $('sc').textContent = score;
+      c.g.visible = false; score++; $('sc').textContent = score; if (conn && conn.open && !c.remote) conn.send({ t: 'c', i: coins.indexOf(c) });
       if (score === 4) toast('Terdengar bisikan dari balik pepohonan...');
       else if (score === 8) toast('Kabut menebal. Kristal di tengah desa bergetar.');
       else if (score < 12) toast('Koin Kuno ditemukan');
@@ -394,7 +453,7 @@ function update(dt) {
     const b = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, 40, 8), new THREE.MeshBasicMaterial({ color: 0x66f0ff, transparent: true, opacity: .35 })); b.position.set(0, 20, 0); scene.add(b);
     $('mt').textContent = 'Semua koin terkumpul. Sentuh kristal biru di tengah desa.'; toast('Kristal di tengah desa bersinar!');
   }
-  if (stage === 1 && Math.hypot(px, pz) < 2.6) { stage = 2; running = false; const sc2 = time - t0; let bst = sc2; try { bst = Math.min(sc2, +localStorage.getItem('desaBest') || sc2); localStorage.setItem('desaBest', bst); } catch (e) {} $('res').textContent = 'Waktumu ' + fmt(sc2) + '. Rekor terbaikmu ' + fmt(bst) + '.'; [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, .5), i * 140)); $('end').classList.remove('hidden'); }
+  if (stage === 1 && Math.hypot(px, pz) < 2.6) { stage = 2; running = false; if (conn && conn.open) conn.send({ t: 'w' }); const sc2 = time - t0; let bst = sc2; try { bst = Math.min(sc2, +localStorage.getItem('desaBest') || sc2); localStorage.setItem('desaBest', bst); } catch (e) {} $('res').textContent = 'Waktumu ' + fmt(sc2) + '. Rekor terbaikmu ' + fmt(bst) + '.'; [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, .5), i * 140)); $('end').classList.remove('hidden'); }
 }
 
 function frame() {
