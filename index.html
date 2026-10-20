@@ -12,66 +12,33 @@
 <canvas id="game"></canvas>
 
 <div id="title" class="hud"><h1>Desa Misteri</h1></div>
-
-<div id="score" class="hud plank">
-  <i class="coin"></i><b id="sc">0</b>/12
-  <span id="tm">00:00</span>
-</div>
-
+<div id="score" class="hud plank"><b id="sc" hidden>0</b><span class="hpbar"><i id="hpf"></i></span><span id="tm">00:00</span></div>
 <canvas id="map" class="hud" width="340" height="340"></canvas>
-
-<div id="mission" class="hud plank">
-  <b>Misi</b>
-  <span id="mt">Cari 12 Koin Kuno, tandanya titik kuning di peta. Tiap koin dijaga teka-teki.</span>
-</div>
-
-<div id="npc" class="hud">
-  <em>Pak Darto</em>
-  <span id="nt"></span>
-</div>
-
-<div id="keys" class="hud">
-  WASD: jalan &nbsp; Spasi: lompat &nbsp; Shift: lari &nbsp;
-  Klik/P: pukul &nbsp; E: masuk ring &nbsp; Geser mouse: putar kamera
-</div>
-
+<div id="mission" class="hud plank"><b>Misi</b><span id="mt">Temukan gua harta karun di pegunungan utara. Bawa kampak dari rumah warga untuk melawan zombi.</span></div>
+<div id="inv" class="hud plank"></div>
+<div id="hint" class="hud"></div>
+<div id="npc" class="hud"><em>Pak Darto</em><span id="nt"></span></div>
+<div id="keys" class="hud">WASD / panah: jalan &nbsp; Spasi: lompat &nbsp; E: aksi &nbsp; F: serang &nbsp; Q: makan ikan &nbsp; Shift: lari &nbsp; Geser mouse: putar kamera</div>
 <div id="toast" class="hud"></div>
-
-<div id="hpwrap">
-  <div class="hpline">
-    <span id="hpNameMe">Kamu</span>
-    <span id="hpNameFoe">Lawan</span>
-  </div>
-  <div class="hpbar"><div class="hpfill" id="hpMe"></div></div>
-  <div class="hpbar" style="margin-top:6px"><div class="hpfill foe" id="hpFoe"></div></div>
-</div>
-
-<div id="battleMsg"></div>
-<div id="ringPrompt">Tekan <b>E</b> untuk masuk/keluar ring</div>
-<div id="hitflash"></div>
+<div id="boss" class="hud"><em>Raja Terakhir</em><span><i id="bossf"></i></span></div>
+<div id="hurt"></div><div id="fade"></div>
 
 <div id="start" class="overlay">
   <h2>Desa<br>Misteri</h2>
-  <p>
-    Senja turun di desa kecil ini, dan koin-koin tua mulai menyala di antara pepohonan.
-    Kumpulkan semuanya, jawab teka-teki penjaganya, lalu sentuh kristal di tengah desa.
-    Ada juga <b>ring adu jotos</b> di sebelah timur kalau mau berantem sama teman mabar.
-  </p>
+  <p>Senja turun di desa kecil ini. Konon di balik pegunungan utara ada gua yang menyimpan istana tua dan harta karun, dijaga zombi dan seorang raja yang tak bisa mati. Siapkan kampakmu.</p>
   <button id="go" class="plank">Main sendiri</button>
-
   <div class="lobby">
     <input id="nm" maxlength="12" placeholder="Namamu" autocomplete="off">
     <button id="mk" class="plank">Buat room</button>
     <input id="cd" maxlength="4" placeholder="Kode" autocomplete="off">
     <button id="jn" class="plank">Masuk room</button>
   </div>
-
   <p id="lob"></p>
 </div>
 
 <div id="end" class="overlay hidden">
-  <h2>Selesai</h2>
-  <p>Kristal menyala terang dan kabut perlahan menipis. Desa kembali tenang.</p>
+  <h2>Harta karun ditemukan</h2>
+  <p>Sang raja telah tumbang dan peti emas di istana gua kini milikmu. Desa aman kembali.</p>
   <p id="res"></p>
   <button class="plank" onclick="location.reload()">Main lagi</button>
 </div>
@@ -83,26 +50,14 @@
     <div id="opts" class="opts"></div>
   </div>
 </div>
-
 <div id="joy" class="touch-only"><div id="knob"></div></div>
 <button id="jump" class="touch-only plank">Lompat</button>
-<button id="punch" class="touch-only plank">Pukul</button>
+<button id="act" class="touch-only plank">Aksi</button>
+<button id="atk" class="touch-only plank">Serang</button>
 
-<script>
-addEventListener('error', function(e) {
-  var p = document.querySelector('#start p');
-  if (p) p.textContent = 'Gagal memuat game: ' + e.message +
-    (e.lineno ? ' (baris ' + e.lineno + ')' : '') +
-    '. Pastikan internet aktif lalu muat ulang halaman.';
-});
-</script>
-
+<script>addEventListener('error',function(e){var p=document.querySelector('#start p');if(p)p.textContent='Gagal memuat game: '+e.message+(e.lineno?' (baris '+e.lineno+')':'')+'. Pastikan internet aktif lalu muat ulang halaman.'});</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
-
 <script src="game.js"></script>
-<script src="ring.js"></script>
-<script src="multiplayer.js"></script>
-
 </body>
 </html>

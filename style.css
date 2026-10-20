@@ -1,25 +1,23 @@
-/* ==================== VARIABEL ==================== */
 :root {
   --kayu: #3b2514;
   --papan: #7b5230;
   --kapur: #eef2e6;
   --tulis: #1d3a30;
-  --font: 'Bungee', 'Impact', 'Arial Black', sans-serif;
-  --body: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font: "Bungee", "Impact", "Arial Black", sans-serif;
+  --body: "Trebuchet MS", "Segoe UI", sans-serif;
 }
-
-/* ==================== RESET ==================== */
-* { margin: 0; box-sizing: border-box; }
-
-html, body {
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+html,
+body {
   height: 100%;
   overflow: hidden;
   background: #141a33;
   color: #f6ead2;
   font-family: var(--body);
 }
-
-/* ==================== CANVAS GAME ==================== */
 #game {
   display: block;
   width: 100%;
@@ -29,33 +27,35 @@ html, body {
   -webkit-user-select: none;
   user-select: none;
 }
-#game:active { cursor: grabbing; }
-
-/* ==================== HUD UMUM ==================== */
+#game:active {
+  cursor: grabbing;
+}
 .hud {
   position: fixed;
   pointer-events: none;
 }
-
 .plank {
   background:
     repeating-linear-gradient(90deg, #0000 0 46px, #0003 46px 48px),
     linear-gradient(#8a5c35, #68431f);
   border: 3px solid var(--kayu);
   border-radius: 5px;
-  box-shadow: 0 4px 0 #24150a, 0 10px 20px #0007;
+  box-shadow:
+    0 4px 0 #24150a,
+    0 10px 20px #0007;
   color: #f6ead2;
 }
-
-/* ==================== JUDUL ==================== */
-#title { top: 14px; left: 20px; }
+#title {
+  top: 14px;
+  left: 20px;
+}
 #title h1 {
   font: 400 28px/1 var(--font);
   color: #f6ead2;
-  text-shadow: 3px 3px 0 var(--kayu), -1px -1px 0 var(--kayu);
+  text-shadow:
+    3px 3px 0 var(--kayu),
+    -1px -1px 0 var(--kayu);
 }
-
-/* ==================== SKOR ==================== */
 #score {
   top: 14px;
   right: 20px;
@@ -65,11 +65,13 @@ html, body {
   gap: 6px;
   font: 400 20px var(--font);
 }
-#score b { font-weight: 400; }
+#score b {
+  font-weight: 400;
+}
 #score span {
   margin-left: 12px;
   font: 400 14px var(--body);
-  opacity: .8;
+  opacity: 0.8;
   font-variant-numeric: tabular-nums;
 }
 .coin {
@@ -79,8 +81,6 @@ html, body {
   background: radial-gradient(circle at 35% 35%, #ffe27a, #d99a00);
   border: 2px solid #7a4a00;
 }
-
-/* ==================== PETA MINI ==================== */
 #map {
   top: 78px;
   right: 20px;
@@ -89,10 +89,10 @@ html, body {
   border-radius: 50%;
   border: 6px solid #5a3a22;
   background: #1d3a30c8;
-  box-shadow: 0 0 0 2px #24150a, 0 10px 20px #0007;
+  box-shadow:
+    0 0 0 2px #24150a,
+    0 10px 20px #0007;
 }
-
-/* ==================== MISI ==================== */
 #mission {
   bottom: 22px;
   left: 50%;
@@ -108,8 +108,6 @@ html, body {
   margin-right: 10px;
   color: #ffd24a;
 }
-
-/* ==================== NPC BUBBLE ==================== */
 #npc {
   bottom: 96px;
   left: 50%;
@@ -131,19 +129,15 @@ html, body {
   margin-bottom: 2px;
   font-style: normal;
 }
-
-/* ==================== KONTROL HINT ==================== */
 #keys {
   bottom: 22px;
   left: 20px;
   font-size: 12px;
-  max-width: 220px;
+  max-width: 190px;
   line-height: 1.7;
-  opacity: .85;
+  opacity: 0.85;
   text-shadow: 0 1px 4px #000;
 }
-
-/* ==================== TOAST ==================== */
 #toast {
   top: 92px;
   left: 50%;
@@ -152,13 +146,11 @@ html, body {
   padding: 9px 18px;
   border-radius: 8px;
   opacity: 0;
-  transition: opacity .4s;
+  transition: opacity 0.4s;
   text-align: center;
   max-width: min(380px, 60vw);
   font-size: 14px;
 }
-
-/* ==================== OVERLAY UMUM ==================== */
 .overlay {
   position: fixed;
   inset: 0;
@@ -171,8 +163,9 @@ html, body {
   text-align: center;
   background: #0b1020d9;
 }
-.overlay.hidden { display: none; }
-
+.overlay.hidden {
+  display: none;
+}
 #start {
   align-items: flex-start;
   justify-content: flex-end;
@@ -180,32 +173,29 @@ html, body {
   padding: 6vh 7vw;
   background: linear-gradient(0deg, #0b1020ee 10%, #0b102033 65%);
 }
-
 .overlay h2 {
-  font: 400 clamp(40px, 8vw, 84px)/.95 var(--font);
+  font: 400 clamp(40px, 8vw, 84px)/0.95 var(--font);
   color: #f6ead2;
   text-shadow: 4px 4px 0 var(--kayu);
 }
 .overlay p {
   max-width: 440px;
   line-height: 1.6;
-  opacity: .92;
+  opacity: 0.92;
 }
-
-/* ==================== TOMBOL ==================== */
 button {
   cursor: pointer;
   font: 400 17px var(--font);
   padding: 12px 28px;
   color: #f6ead2;
 }
-button:hover { filter: brightness(1.15); }
+button:hover {
+  filter: brightness(1.15);
+}
 button:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 3px;
 }
-
-/* ==================== LOBBY MABAR ==================== */
 .lobby {
   display: flex;
   flex-wrap: wrap;
@@ -227,7 +217,9 @@ button:focus-visible {
   width: 150px;
   text-transform: none;
 }
-.lobby input::placeholder { color: #eef2e680; }
+.lobby input::placeholder {
+  color: #eef2e680;
+}
 .lobby button {
   padding: 11px 18px;
   font-size: 14px;
@@ -237,23 +229,129 @@ button:focus-visible {
   color: #ffd24a;
   font-size: 14px;
 }
-
-/* ==================== QUIZ ==================== */
-#quiz { z-index: 5; }
-
+#inv {
+  top: 50px;
+  left: 20px;
+  padding: 6px 12px;
+  font-size: 13px;
+  white-space: pre;
+}
+#hint {
+  bottom: 172px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  background: #000b;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font: 400 14px var(--font);
+  text-align: center;
+}
+#act {
+  position: fixed;
+  right: 26px;
+  bottom: 128px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 13px;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#score span.hpbar {
+  display: block;
+  width: 110px;
+  height: 12px;
+  margin: 0;
+  border: 2px solid var(--kayu);
+  background: #3b2514;
+  border-radius: 6px;
+  overflow: hidden;
+  opacity: 1;
+}
+#hpf {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #c0392b;
+}
+#boss {
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  width: min(360px, 70vw);
+  text-align: center;
+}
+#boss em {
+  font: 400 14px var(--font);
+  font-style: normal;
+  text-shadow: 2px 2px 0 var(--kayu);
+}
+#boss span {
+  display: block;
+  height: 14px;
+  border: 3px solid var(--kayu);
+  background: #3b2514;
+  border-radius: 7px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+#bossf {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #7a2fb0;
+}
+#hurt {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(transparent 40%, #c0141499);
+  z-index: 4;
+}
+#fade {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: #000;
+  z-index: 6;
+}
+#atk {
+  position: fixed;
+  right: 122px;
+  bottom: 30px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 13px;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#quiz {
+  z-index: 5;
+}
 .board {
   background: linear-gradient(135deg, #24473b, var(--tulis));
   border: 12px solid var(--papan);
   outline: 3px solid var(--kayu);
-  box-shadow: inset 0 0 40px #0006, 0 14px 30px #000a;
+  box-shadow:
+    inset 0 0 40px #0006,
+    0 14px 30px #000a;
   padding: 24px;
   width: min(480px, 100%);
-  font-family: 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive;
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
   color: var(--kapur);
 }
 .board p {
   font-size: 13px;
-  opacity: .75;
+  opacity: 0.75;
   margin-bottom: 8px;
 }
 .board h3 {
@@ -276,22 +374,26 @@ button:focus-visible {
   border: 2px dashed #eef2e68c;
   border-radius: 6px;
   padding: 11px 14px;
-  font: 400 17px 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive;
+  font:
+    400 17px "Segoe Print",
+    "Bradley Hand",
+    "Comic Sans MS",
+    cursive;
 }
 .opt::before {
   counter-increment: o;
-  content: counter(o, upper-alpha) '. ';
-  opacity: .7;
+  content: counter(o, upper-alpha) ". ";
+  opacity: 0.7;
 }
 .opt:hover {
   background: #eef2e61f;
   filter: none;
 }
-
-/* ==================== KONTROL SENTUH ==================== */
-.touch-only { display: none; }
-
-#joy, #jump, #punch {
+.touch-only {
+  display: none;
+}
+#joy,
+#jump {
   position: fixed;
   bottom: 26px;
   touch-action: none;
@@ -299,7 +401,6 @@ button:focus-visible {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
-
 #joy {
   left: 26px;
   width: 130px;
@@ -327,112 +428,27 @@ button:focus-visible {
   padding: 0;
   font-size: 14px;
 }
-#punch {
-  right: 124px;
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  padding: 0;
-  font-size: 14px;
-  background: linear-gradient(#a33, #611);
-  border-color: #3a0a0a;
-}
-
-/* ==================== HUD BATTLE (RING) ==================== */
-#hpwrap {
-  position: fixed;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(560px, 90vw);
-  display: none;
-  pointer-events: none;
-  z-index: 6;
-}
-#hpwrap .hpline {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  font: 400 12px var(--font);
-  color: #fff;
-  text-shadow: 0 2px 4px #000;
-  margin-bottom: 4px;
-}
-.hpbar {
-  height: 16px;
-  background: #0007;
-  border: 3px solid var(--kayu);
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: 0 3px 0 #24150a;
-}
-.hpfill {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(#ff5a5a, #a00);
-  transition: width .18s ease-out;
-}
-.hpfill.foe {
-  background: linear-gradient(#5aa0ff, #1c4aa0);
-}
-
-#battleMsg {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font: 400 clamp(30px, 7vw, 72px) var(--font);
-  color: #ffd24a;
-  text-shadow: 5px 5px 0 #3b2514, 0 0 30px #000;
-  opacity: 0;
-  transition: opacity .35s;
-  pointer-events: none;
-  z-index: 7;
-  text-align: center;
-}
-#battleMsg.show { opacity: 1; }
-
-#ringPrompt {
-  position: fixed;
-  bottom: 170px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--kapur);
-  color: #2a190c;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 3px solid var(--kayu);
-  font: 400 14px var(--font);
-  display: none;
-  z-index: 6;
-}
-
-#hitflash {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, #f003 0%, #f000 70%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 4;
-  transition: opacity .25s;
-}
-
-/* ==================== RESPONSIVE ==================== */
 @media (pointer: coarse) {
-  .touch-only { display: block; }
-  #keys { display: none; }
+  .touch-only {
+    display: block;
+  }
+  #keys {
+    display: none;
+  }
 }
-
 @media (max-width: 600px) {
-  #title h1 { font-size: 20px; }
+  #title h1 {
+    font-size: 20px;
+  }
   #score {
     top: 10px;
     right: 12px;
     padding: 5px 10px;
     font-size: 16px;
   }
-  #score span { display: none; }
+  #score span {
+    display: none;
+  }
   #map {
     width: 104px;
     height: 104px;
@@ -454,17 +470,59 @@ button:focus-visible {
     display: block;
     margin: 0 0 2px;
   }
-  #npc { bottom: 160px; font-size: 13px; }
-  #toast { top: 172px; font-size: 13px; max-width: 70vw; }
-  #joy { left: 16px; bottom: 18px; }
-  #jump { right: 16px; bottom: 24px; }
-  #punch { right: 112px; bottom: 24px; width: 76px; height: 76px; }
-  #hpwrap { top: 60px; }
+  #npc {
+    bottom: 160px;
+    font-size: 13px;
+  }
+  #toast {
+    top: 172px;
+    font-size: 13px;
+    max-width: 70vw;
+  }
+  #joy {
+    left: 16px;
+    bottom: 18px;
+  }
+  #jump {
+    right: 16px;
+    bottom: 24px;
+  }
+  #act {
+    right: 16px;
+    bottom: 122px;
+  }
+  #atk {
+    right: 108px;
+    bottom: 30px;
+  }
+  #inv {
+    top: 112px;
+    left: 12px;
+    font-size: 11px;
+    padding: 5px 9px;
+  }
+  #hint {
+    bottom: 226px;
+    font-size: 12px;
+  }
+  #start {
+    padding: 8vh 6vw;
+  }
 }
-
 @media (max-height: 480px) {
-  #joy { width: 110px; height: 110px; bottom: 10px; }
-  #knob { left: 25px; top: 25px; }
-  #jump { bottom: 12px; }
-  #npc { bottom: 70px; }
+  #joy {
+    width: 110px;
+    height: 110px;
+    bottom: 10px;
+  }
+  #knob {
+    left: 25px;
+    top: 25px;
+  }
+  #jump {
+    bottom: 12px;
+  }
+  #npc {
+    bottom: 70px;
+  }
 }
