@@ -1586,6 +1586,23 @@
   cfish.scale.set(2.4, 0.9, 0.7);
   cfish.visible = false;
   scene.add(cfish);
+  // HP: coba layar penuh + kunci mode miring (Android Chrome); iPhone cukup diputar manual
+  if (window.matchMedia && matchMedia("(pointer:coarse)").matches)
+    ["go", "mk", "jn"].forEach((id) =>
+      $(id).addEventListener("click", () => {
+        try {
+          const d = document.documentElement;
+          (d.requestFullscreen ? d.requestFullscreen() : Promise.resolve())
+            .then(
+              () =>
+                screen.orientation &&
+                screen.orientation.lock &&
+                screen.orientation.lock("landscape"),
+            )
+            .catch(() => {});
+        } catch (e) {}
+      }),
+    );
   const ab = $("act");
   ab.addEventListener("pointerdown", () => (keys.KeyE = true));
   ["pointerup", "pointercancel"].forEach((e) =>
